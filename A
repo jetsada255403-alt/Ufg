@@ -1,0 +1,38 @@
+-- Potent Config
+shared = shared or {}
+
+local playersService = game:GetService("Players")
+local localPlayer = playersService.LocalPlayer
+local character = localPlayer.Character or localPlayer.CharacterAdded:Wait()
+
+shared.Potent = {
+    Services = {
+        Players = playersService,
+        ReplicatedStorage = game:GetService("ReplicatedStorage"),
+        RunService = game:GetService("RunService"),
+        UserInputService = game:GetService("UserInputService"),
+        TweenService = game:GetService("TweenService"),
+        CoreGui = game:GetService("CoreGui"),
+        Lighting = game:GetService("Lighting"),
+        Workspace = game:GetService("Workspace"),
+    },
+    Player = localPlayer,
+    Character = character,
+    Humanoid = character:WaitForChild("Humanoid"),
+    RootPart = character:WaitForChild("HumanoidRootPart"),
+    Config = {
+        KillAura = false, KillAuraRange = 30,
+        AutoCollect = false, CollectRange = 50,
+        SpeedEnabled = false, SpeedValue = 60,
+        JumpEnabled = false, JumpValue = 120,
+        InfiniteJump = false, Noclip = false,
+        ESPZombies = false, ESPBoss = false,
+        Invincible = false, FreeCam = false,
+        FreeCamSpeed = 60, AutoKillBoss = false,
+    },
+    EspCache = {},
+    ZombieEspEnabled = false,
+    BossEspEnabled = false,
+}
+
+warn("[Potent] ส่วนที่ 1: Config โหลดแล้ว")
