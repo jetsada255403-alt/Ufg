@@ -1,0 +1,611 @@
+-- Potent GUI
+local C = shared.Potent
+if not C then return warn("[Potent] กรุณารันส่วนที่ 1 ก่อน") end
+local F = C.Functions
+if not F then return warn("[Potent] กรุณารันส่วนที่ 2 ก่อน") end
+
+local UIS = C.Services.UserInputService
+local TweenService = C.Services.TweenService
+local CoreGui = C.Services.CoreGui
+local CONFIG = C.Config
+
+if C.Gui then pcall(function() C.Gui:Destroy() end) end
+
+local gui = Instance.new("ScreenGui")
+gui.Name = "PotentMenu"
+gui.ResetOnSpawn = false
+gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+gui.IgnoreGuiInset = true
+pcall(function() gui.Parent = CoreGui end)
+if not gui.Parent then gui.Parent = C.Player:WaitForChild("PlayerGui") end
+C.Gui = gui
+
+local circle = Instance.new("TextButton")
+circle.Size = UDim2.fromOffset(56, 56)
+circle.Position = UDim2.new(0, 24, 0.5, -28)
+circle.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+circle.Text = "P"
+circle.TextColor3 = Color3.fromRGB(220, 30, 40)
+circle.Font = Enum.Font.GothamBlack
+circle.TextSize = 26
+circle.AutoButtonColor = false
+circle.Parent = gui
+
+local cc = Instance.new("UICorner")
+cc.CornerRadius = UDim.new(1, 0)
+cc.Parent = circle
+
+local cs = Instance.new("UIStroke")
+cs.Thickness = 2
+cs.Color = Color3.fromRGB(200, 25, 35)
+cs.Parent = circle
+
+local panel = Instance.new("Frame")
+panel.Size = UDim2.fromOffset(560, 380)
+panel.Position = UDim2.new(0.5, -280, 0.5, -190)
+panel.BackgroundColor3 = Color3.fromRGB(16, 16, 18)
+panel.BorderSizePixel = 0
+panel.Visible = false
+panel.Parent = gui
+
+local pc = Instance.new("UICorner")
+pc.CornerRadius = UDim.new(0, 12)
+pc.Parent = panel
+
+local ps = Instance.new("UIStroke")
+ps.Thickness = 1.5
+ps.Color = Color3.fromRGB(180, 20, 30)
+ps.Transparency = 0.25
+ps.Parent = panel
+
+local pg = Instance.new("UIGradient")
+pg.Color = ColorSequence.new({
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(28, 28, 32)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(12, 12, 14)),
+})
+pg.Rotation = 90
+pg.Parent = panel
+
+local topBar = Instance.new("Frame")
+topBar.Size = UDim2.new(1, 0, 0, 40)
+topBar.BackgroundColor3 = Color3.fromRGB(22, 22, 26)
+topBar.BackgroundTransparency = 0.3
+topBar.BorderSizePixel = 0
+topBar.Parent = panel
+
+local tc = Instance.new("UICorner")
+tc.CornerRadius = UDim.new(0, 12)
+tc.Parent = topBar
+
+local accent = Instance.new("Frame")
+accent.Size = UDim2.fromOffset(4, 18)
+accent.Position = UDim2.fromOffset(6, 11)
+accent.BackgroundColor3 = Color3.fromRGB(210, 25, 35)
+accent.BorderSizePixel = 0
+accent.Parent = topBar
+
+local ac = Instance.new("UICorner")
+ac.CornerRadius = UDim.new(1, 0)
+ac.Parent = accent
+
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1, -100, 1, 0)
+title.Position = UDim2.fromOffset(16, 0)
+title.BackgroundTransparency = 1
+title.Text = "POTENT  //  สร้างและฆ่าซอมบี้"
+title.TextColor3 = Color3.fromRGB(235, 235, 240)
+title.Font = Enum.Font.GothamBold
+title.TextSize = 14
+title.TextXAlignment = Enum.TextXAlignment.Left
+title.Parent = topBar
+
+local minBtn = Instance.new("TextButton")
+minBtn.Size = UDim2.fromOffset(28, 28)
+minBtn.Position = UDim2.new(1, -70, 0, 6)
+minBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 46)
+minBtn.Text = "—"
+minBtn.TextColor3 = Color3.fromRGB(220, 220, 225)
+minBtn.Font = Enum.Font.GothamBold
+minBtn.TextSize = 16
+minBtn.BorderSizePixel = 0
+minBtn.Parent = topBar
+
+local mc = Instance.new("UICorner")
+mc.CornerRadius = UDim.new(0, 6)
+mc.Parent = minBtn
+
+local closeBtn = Instance.new("TextButton")
+closeBtn.Size = UDim2.fromOffset(28, 28)
+closeBtn.Position = UDim2.new(1, -36, 0, 6)
+closeBtn.BackgroundColor3 = Color3.fromRGB(60, 20, 25)
+closeBtn.Text = "✕"
+closeBtn.TextColor3 = Color3.fromRGB(240, 80, 90)
+closeBtn.Font = Enum.Font.GothamBold
+closeBtn.TextSize = 14
+closeBtn.BorderSizePixel = 0
+closeBtn.Parent = topBar
+
+local clc = Instance.new("UICorner")
+clc.CornerRadius = UDim.new(0, 6)
+clc.Parent = closeBtn
+
+local sidebar = Instance.new("Frame")
+sidebar.Size = UDim2.new(0, 140, 1, -50)
+sidebar.Position = UDim2.fromOffset(8, 45)
+sidebar.BackgroundTransparency = 1
+sidebar.Parent = panel
+
+local sl = Instance.new("UIListLayout")
+sl.Padding = UDim.new(0, 6)
+sl.SortOrder = Enum.SortOrder.LayoutOrder
+sl.Parent = sidebar
+
+local sp = Instance.new("UIPadding")
+sp.PaddingLeft = UDim.new(0, 4)
+sp.PaddingRight = UDim.new(0, 4)
+sp.PaddingTop = UDim.new(0, 4)
+sp.Parent = sidebar
+
+local content = Instance.new("ScrollingFrame")
+content.Size = UDim2.new(1, -170, 1, -60)
+content.Position = UDim2.fromOffset(160, 50)
+content.BackgroundTransparency = 1
+content.BorderSizePixel = 0
+content.ScrollBarThickness = 3
+content.ScrollBarImageColor3 = Color3.fromRGB(200, 25, 35)
+content.CanvasSize = UDim2.new(0, 0, 0, 0)
+content.AutomaticCanvasSize = Enum.AutomaticSize.Y
+content.Parent = panel
+
+local cl = Instance.new("UIListLayout")
+cl.Padding = UDim.new(0, 8)
+cl.SortOrder = Enum.SortOrder.LayoutOrder
+cl.Parent = content
+
+local cp = Instance.new("UIPadding")
+cp.PaddingTop = UDim.new(0, 6)
+cp.PaddingRight = UDim.new(0, 8)
+cp.PaddingBottom = UDim.new(0, 12)
+cp.Parent = content
+
+local function createToggle(parent, text, default, callback)
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(1, 0, 0, 34)
+    btn.BackgroundColor3 = Color3.fromRGB(26, 26, 30)
+    btn.Text = ""
+    btn.AutoButtonColor = false
+    btn.BorderSizePixel = 0
+    btn.Parent = parent
+
+    local c = Instance.new("UICorner")
+    c.CornerRadius = UDim.new(0, 8)
+    c.Parent = btn
+
+    local s = Instance.new("UIStroke")
+    s.Thickness = 1
+    s.Color = Color3.fromRGB(60, 60, 68)
+    s.Transparency = 0.4
+    s.Parent = btn
+
+    local l = Instance.new("TextLabel")
+    l.Size = UDim2.new(1, -60, 1, 0)
+    l.Position = UDim2.fromOffset(14, 0)
+    l.BackgroundTransparency = 1
+    l.Text = text
+    l.TextColor3 = Color3.fromRGB(220, 220, 226)
+    l.Font = Enum.Font.Gotham
+    l.TextSize = 13
+    l.TextXAlignment = Enum.TextXAlignment.Left
+    l.Parent = btn
+
+    local ind = Instance.new("Frame")
+    ind.Size = UDim2.fromOffset(34, 18)
+    ind.Position = UDim2.new(1, -46, 0.5, -9)
+    ind.BackgroundColor3 = Color3.fromRGB(45, 45, 52)
+    ind.BorderSizePixel = 0
+    ind.Parent = btn
+
+    local ic = Instance.new("UICorner")
+    ic.CornerRadius = UDim.new(1, 0)
+    ic.Parent = ind
+
+    local knob = Instance.new("Frame")
+    knob.Size = UDim2.fromOffset(14, 14)
+    knob.Position = UDim2.fromOffset(2, 2)
+    knob.BackgroundColor3 = Color3.fromRGB(180, 180, 190)
+    knob.BorderSizePixel = 0
+    knob.Parent = ind
+
+    local kc = Instance.new("UICorner")
+    kc.CornerRadius = UDim.new(1, 0)
+    kc.Parent = knob
+
+    local state = default
+    local function render()
+        local tc2 = state and Color3.fromRGB(200, 25, 35) or Color3.fromRGB(45, 45, 52)
+        local kp = state and UDim2.fromOffset(18, 2) or UDim2.fromOffset(2, 2)
+        TweenService:Create(ind, TweenInfo.new(0.15), { BackgroundColor3 = tc2 }):Play()
+        TweenService:Create(knob, TweenInfo.new(0.15), { Position = kp }):Play()
+        s.Color = state and Color3.fromRGB(200, 25, 35) or Color3.fromRGB(60, 60, 68)
+    end
+    render()
+
+    btn.MouseButton1Click:Connect(function()
+        state = not state
+        render()
+        F.safeCall(callback, state)
+    end)
+    return btn
+end
+
+local function createSlider(parent, text, min, max, default, callback)
+    local holder = Instance.new("Frame")
+    holder.Size = UDim2.new(1, 0, 0, 52)
+    holder.BackgroundColor3 = Color3.fromRGB(26, 26, 30)
+    holder.BorderSizePixel = 0
+    holder.Parent = parent
+
+    local c = Instance.new("UICorner")
+    c.CornerRadius = UDim.new(0, 8)
+    c.Parent = holder
+
+    local s = Instance.new("UIStroke")
+    s.Thickness = 1
+    s.Color = Color3.fromRGB(60, 60, 68)
+    s.Transparency = 0.4
+    s.Parent = holder
+
+    local l = Instance.new("TextLabel")
+    l.Size = UDim2.new(1, -20, 0, 22)
+    l.Position = UDim2.fromOffset(12, 4)
+    l.BackgroundTransparency = 1
+    l.Text = text .. ": " .. tostring(default)
+    l.TextColor3 = Color3.fromRGB(220, 220, 226)
+    l.Font = Enum.Font.Gotham
+    l.TextSize = 12
+    l.TextXAlignment = Enum.TextXAlignment.Left
+    l.Parent = holder
+
+    local bg = Instance.new("Frame")
+    bg.Size = UDim2.new(1, -24, 0, 6)
+    bg.Position = UDim2.new(0, 12, 1, -16)
+    bg.BackgroundColor3 = Color3.fromRGB(45, 45, 52)
+    bg.BorderSizePixel = 0
+    bg.Parent = holder
+
+    local bgc = Instance.new("UICorner")
+    bgc.CornerRadius = UDim.new(1, 0)
+    bgc.Parent = bg
+
+    local fill = Instance.new("Frame")
+    fill.Size = UDim2.new((default - min) / (max - min), 0, 1, 0)
+    fill.BackgroundColor3 = Color3.fromRGB(200, 25, 35)
+    fill.BorderSizePixel = 0
+    fill.Parent = bg
+
+    local fc = Instance.new("UICorner")
+    fc.CornerRadius = UDim.new(1, 0)
+    fc.Parent = fill
+
+    local dragging = false
+    local function update(x)
+        local rel = math.clamp((x - bg.AbsolutePosition.X) / bg.AbsoluteSize.X, 0, 1)
+        local value = math.floor(min + (max - min) * rel + 0.5)
+        fill.Size = UDim2.new(rel, 0, 1, 0)
+        l.Text = text .. ": " .. tostring(value)
+        F.safeCall(callback, value)
+    end
+
+    bg.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = true
+            update(input.Position.X)
+        end
+    end)
+    UIS.InputChanged:Connect(function(input)
+        if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+            update(input.Position.X)
+        end
+    end)
+    UIS.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = false
+        end
+    end)
+    return holder
+end
+
+local function createButton(parent, text, callback)
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(1, 0, 0, 34)
+    btn.BackgroundColor3 = Color3.fromRGB(200, 25, 35)
+    btn.Text = text
+    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    btn.Font = Enum.Font.GothamBold
+    btn.TextSize = 13
+    btn.AutoButtonColor = false
+    btn.BorderSizePixel = 0
+    btn.Parent = parent
+
+    local c = Instance.new("UICorner")
+    c.CornerRadius = UDim.new(0, 8)
+    c.Parent = btn
+
+    btn.MouseEnter:Connect(function()
+        TweenService:Create(btn, TweenInfo.new(0.15), { BackgroundColor3 = Color3.fromRGB(230, 40, 50) }):Play()
+    end)
+    btn.MouseLeave:Connect(function()
+        TweenService:Create(btn, TweenInfo.new(0.15), { BackgroundColor3 = Color3.fromRGB(200, 25, 35) }):Play()
+    end)
+    btn.MouseButton1Click:Connect(function() F.safeCall(callback) end)
+    return btn
+end
+
+local function createSection(parent, titleText)
+    local sec = Instance.new("Frame")
+    sec.Size = UDim2.new(1, 0, 0, 0)
+    sec.AutomaticSize = Enum.AutomaticSize.Y
+    sec.BackgroundTransparency = 1
+    sec.Parent = parent
+
+    local lay = Instance.new("UIListLayout")
+    lay.Padding = UDim.new(0, 6)
+    lay.SortOrder = Enum.SortOrder.LayoutOrder
+    lay.Parent = sec
+
+    local h = Instance.new("TextLabel")
+    h.Size = UDim2.new(1, 0, 0, 24)
+    h.BackgroundTransparency = 1
+    h.Text = "▸ " .. titleText
+    h.TextColor3 = Color3.fromRGB(210, 25, 35)
+    h.Font = Enum.Font.GothamBold
+    h.TextSize = 13
+    h.TextXAlignment = Enum.TextXAlignment.Left
+    h.Parent = sec
+    return sec
+end
+
+local function createCatButton(parent, text, order)
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(1, 0, 0, 34)
+    btn.LayoutOrder = order
+    btn.BackgroundColor3 = Color3.fromRGB(24, 24, 28)
+    btn.Text = text
+    btn.TextColor3 = Color3.fromRGB(200, 200, 210)
+    btn.Font = Enum.Font.GothamMedium
+    btn.TextSize = 13
+    btn.AutoButtonColor = false
+    btn.BorderSizePixel = 0
+    btn.Parent = parent
+
+    local c = Instance.new("UICorner")
+    c.CornerRadius = UDim.new(0, 8)
+    c.Parent = btn
+
+    local a = Instance.new("Frame")
+    a.Size = UDim2.new(0, 3, 1, -10)
+    a.Position = UDim2.fromOffset(0, 5)
+    a.BackgroundColor3 = Color3.fromRGB(200, 25, 35)
+    a.BackgroundTransparency = 1
+    a.BorderSizePixel = 0
+    a.Parent = btn
+
+    local ac2 = Instance.new("UICorner")
+    ac2.CornerRadius = UDim.new(0, 4)
+    ac2.Parent = a
+    return btn, a
+end
+
+local categories = {
+    { name = "⚔ ต่อสู้", key = "combat" },
+    { name = "🏃 การเคลื่อนที่", key = "movement" },
+    { name = "💰 เก็บของ", key = "collect" },
+    { name = "👁 ESP", key = "esp" },
+    { name = "🚗 รถยนต์", key = "car" },
+    { name = "🎥 กล้อง", key = "camera" },
+    { name = "🌐 วาร์ป", key = "warp" },
+    { name = "⚙ ตั้งค่า", key = "settings" },
+}
+
+local pages = {}
+local categoryButtons = {}
+
+local function switchPage(key)
+    for k, p in pairs(pages) do p.Visible = (k == key) end
+    for k, d in pairs(categoryButtons) do
+        local active = (k == key)
+        d.btn.BackgroundColor3 = active and Color3.fromRGB(40, 22, 26) or Color3.fromRGB(24, 24, 28)
+        d.btn.TextColor3 = active and Color3.fromRGB(240, 90, 100) or Color3.fromRGB(200, 200, 210)
+        TweenService:Create(d.accent, TweenInfo.new(0.15), { BackgroundTransparency = active and 0 or 1 }):Play()
+    end
+end
+
+for i, cat in ipairs(categories) do
+    local btn, a = createCatButton(sidebar, cat.name, i)
+    categoryButtons[cat.key] = { btn = btn, accent = a }
+    btn.MouseButton1Click:Connect(function() switchPage(cat.key) end)
+
+    local page = Instance.new("Frame")
+    page.Size = UDim2.new(1, 0, 0, 0)
+    page.AutomaticSize = Enum.AutomaticSize.Y
+    page.BackgroundTransparency = 1
+    page.Visible = false
+    page.Parent = content
+
+    local pl = Instance.new("UIListLayout")
+    pl.Padding = UDim.new(0, 8)
+    pl.SortOrder = Enum.SortOrder.LayoutOrder
+    pl.Parent = page
+
+    pages[cat.key] = page
+end
+
+do
+    local p = pages["combat"]
+    local s1 = createSection(p, "การโจมตี")
+    createToggle(s1, "เปิดโหมดฆ่ารอบตัว (Kill Aura)", false, function(v) CONFIG.KillAura = v end)
+    createSlider(s1, "ระยะโจมตี", 5, 200, 30, function(v) CONFIG.KillAuraRange = v end)
+    createButton(s1, "ฆ่าซอมบี้ทั้งหมดทันที", function() F.killAllZombies() end)
+
+    local s2 = createSection(p, "บอส")
+    createButton(s2, "ฆ่าบอส Hacker ทันที", function()
+        local b = F.getBoss()
+        if b then
+            local h = b:FindFirstChildOfClass("Humanoid")
+            if h then h.Health = 0 end
+        end
+    end)
+    createToggle(s2, "ฆ่าบอสอัตโนมัติ", false, function(v) CONFIG.AutoKillBoss = v end)
+
+    local s3 = createSection(p, "ป้องกันตัว")
+    createToggle(s3, "อมตะ (Invincible)", false, function(v) CONFIG.Invincible = v end)
+end
+
+do
+    local p = pages["movement"]
+    local s1 = createSection(p, "ความเร็ว")
+    createToggle(s1, "เปิดปรับความเร็ว", false, function(v)
+        CONFIG.SpeedEnabled = v
+        F.applySpeed()
+    end)
+    createSlider(s1, "ค่าความเร็ว", 16, 500, 60, function(v)
+        CONFIG.SpeedValue = v
+        if CONFIG.SpeedEnabled then F.applySpeed() end
+    end)
+
+    local s2 = createSection(p, "การกระโดด")
+    createToggle(s2, "เปิดปรับพลังกระโดด", false, function(v)
+        CONFIG.JumpEnabled = v
+        F.applyJump()
+    end)
+    createSlider(s2, "พลังกระโดด", 50, 500, 120, function(v)
+        CONFIG.JumpValue = v
+        if CONFIG.JumpEnabled then F.applyJump() end
+    end)
+    createToggle(s2, "กระโดดไม่จำกัด (Infinite Jump)", false, function(v) CONFIG.InfiniteJump = v end)
+
+    local s3 = createSection(p, "อื่นๆ")
+    createToggle(s3, "เดินทะลุกำแพง (Noclip)", false, function(v)
+        CONFIG.Noclip = v
+        if not v then F.updateNoclip() end
+    end)
+end
+
+do
+    local p = pages["collect"]
+    local s1 = createSection(p, "เก็บไอเทม")
+    createToggle(s1, "เก็บเงินอัตโนมัติ (Auto Collect)", false, function(v) CONFIG.AutoCollect = v end)
+    createSlider(s1, "ระยะเก็บ", 5, 300, 50, function(v) CONFIG.CollectRange = v end)
+    createButton(s1, "เก็บเงินทั้งหมดทันที", function() F.collectAllDrops() end)
+end
+
+do
+    local p = pages["esp"]
+    local s1 = createSection(p, "แสดงผล")
+    createToggle(s1, "ESP ซอมบี้", false, function(v)
+        C.ZombieEspEnabled = v
+        CONFIG.ESPZombies = v
+    end)
+    createToggle(s1, "ESP บอส", false, function(v)
+        C.BossEspEnabled = v
+        CONFIG.ESPBoss = v
+    end)
+end
+
+do
+    local p = pages["car"]
+    local s1 = createSection(p, "น้ำมัน")
+    createButton(s1, "เติมน้ำมันเต็มถัง", function()
+        for _, obj in ipairs(C.Services.Workspace:GetDescendants()) do
+            if obj:IsA("NumberValue") and (obj.Name:lower():find("fuel")) then
+                pcall(function() obj.Value = 999999 end)
+            end
+        end
+    end)
+end
+
+do
+    local p = pages["camera"]
+    local s1 = createSection(p, "กล้องอิสระ")
+    createToggle(s1, "เปิดโหมดกล้องอิสระ (WASD + Space/Ctrl)", false, function(v) CONFIG.FreeCam = v end)
+    createSlider(s1, "ความเร็วกล้อง", 10, 300, 60, function(v) CONFIG.FreeCamSpeed = v end)
+end
+
+do
+    local p = pages["warp"]
+    local s1 = createSection(p, "วาร์ปไปโซนซอมบี้")
+    local zones = {"Aqua","Mining","River","City","Volcano","Egypt","Ice","HackerMinion","Pirate","WildWest","RadioActive","Scifi","Basic"}
+    for _, zn in ipairs(zones) do
+        createButton(s1, "วาร์ปไป " .. zn, function()
+            local pos = F.getZonePosition(zn)
+            if pos then F.teleportTo(pos + Vector3.new(0, 5, 0)) end
+        end)
+    end
+
+    local s2 = createSection(p, "จุดสำคัญ")
+    createButton(s2, "วาร์ปไปห้องบอส Hacker", function() F.teleportTo(Vector3.new(22, 20, -128)) end)
+    createButton(s2, "วาร์ปไปป้อมธง (Flag)", function() F.teleportTo(Vector3.new(433, 90, -539)) end)
+    createButton(s2, "วาร์ปไปลาน DJ (Disco)", function() F.teleportTo(Vector3.new(376, 190, -580)) end)
+end
+
+do
+    local p = pages["settings"]
+    local s1 = createSection(p, "ข้อมูล")
+    local info = Instance.new("TextLabel")
+    info.Size = UDim2.new(1, 0, 0, 60)
+    info.BackgroundColor3 = Color3.fromRGB(24, 24, 28)
+    info.Text = "Potent v1.0\nGame: สร้างและฆ่าซอมบี้\nPlaceId: 105011592530400"
+    info.TextColor3 = Color3.fromRGB(200, 200, 210)
+    info.Font = Enum.Font.Gotham
+    info.TextSize = 12
+    info.Parent = s1
+    local ic = Instance.new("UICorner")
+    ic.CornerRadius = UDim.new(0, 8)
+    ic.Parent = info
+    createButton(s1, "ทำลายเมนู", function() gui:Destroy() end)
+end
+
+switchPage("combat")
+
+local function openPanel()
+    circle.Visible = false
+    panel.Visible = true
+    panel.Size = UDim2.fromOffset(0, 0)
+    panel.Position = UDim2.new(0.5, 0, 0.5, 0)
+    TweenService:Create(panel, TweenInfo.new(0.25, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+        Size = UDim2.fromOffset(560, 380),
+        Position = UDim2.new(0.5, -280, 0.5, -190),
+    }):Play()
+end
+
+local function closePanel()
+    TweenService:Create(panel, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
+        Size = UDim2.fromOffset(0, 0),
+        Position = UDim2.new(0.5, 0, 0.5, 0),
+    }):Play()
+    task.wait(0.2)
+    panel.Visible = false
+    circle.Visible = true
+end
+
+circle.MouseButton1Click:Connect(openPanel)
+minBtn.MouseButton1Click:Connect(closePanel)
+closeBtn.MouseButton1Click:Connect(function() gui:Destroy() end)
+
+local dragging, dragStart, startPos
+topBar.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        dragging = true
+        dragStart = input.Position
+        startPos = panel.Position
+    end
+end)
+UIS.InputChanged:Connect(function(input)
+    if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+        local d = input.Position - dragStart
+        panel.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + d.X, startPos.Y.Scale, startPos.Y.Offset + d.Y)
+    end
+end)
+UIS.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+   
