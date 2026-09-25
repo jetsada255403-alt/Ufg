@@ -1,0 +1,240 @@
+-- Potent Functions
+local C = shared.Potent
+if not C then return warn("[Potent] กรุณารันส่วนที่ 1 ก่อน") end
+
+local Players = C.Services.Players
+local RunService = C.Services.RunService
+local UIS = C.Services.UserInputService
+local WS = C.Services.Workspace
+local CONFIG = C.Config
+
+local F = {}
+
+F.safeCall = function(fn, ...)
+    local ok, err = pcall(fn, ...)
+    if not ok then warn("[Potent]", err) end
+end
+
+F.getZombies = function()
+    local list = {}
+    local zf = WS:FindFirstChild("Zombies")
+    if not zf then return list end
+    local models = zf:FindFirstChild("Models")
+    if models then
+        for _, zone in ipairs(models:GetChildren()) do
+            for _, z in ipairs(zone:GetChildren()) do
+                if z:IsA("Model") and z:FindFirstChild("Humanoid") then
+                    table.insert(list, z)
+                end
+            end
+        end
+    end
+    local bosses = zf:FindFirstChild("Bosses")
+    if bosses then
+        for _, z in ipairs(bosses:GetChildren()) do
+            if z:IsA("Model") and z:FindFirstChild("Humanoid") then
+                table.insert(list, z)
+            end
+        end
+    end
+    return list
+end
+
+F.getBoss = function()
+    local zf = WS:FindFirstChild("Zombies")
+    if not zf then return nil end
+    local bosses = zf:FindFirstChild("Bosses")
+    if not bosses then return nil end
+    for _, z in ipairs(bosses:GetChildren()) do
+        if z:IsA("Model") and z:FindFirstChild("Humanoid") then
+            return z
+        end
+    end
+    return nil
+end
+
+F.getDrops = function()
+    local list = {}
+    for _, obj in ipairs(WS:GetDescendants()) do
+        if obj:IsA("BasePart") and obj.Name == "Drop" then
+            table.insert(list, obj)
+        end
+    end
+    return list
+end
+
+F.teleportTo = function(vec)
+    if C.RootPart then C.RootPart.CFrame = CFrame.new(vec) end
+end
+
+F.getZonePosition = function(zoneName)
+    local zf = WS:FindFirstChild("Zombies")
+    if not zf then return nil end
+    local models = zf:FindFirstChild("Models")
+    if not models then return nil end
+    local zone = models:FindFirstChild(zoneName)
+    if not zone then return nil end
+    for _, z in ipairs(zone:GetChildren()) do
+        if z:IsA("Model") then
+            local hrp = z:FindFirstChild("HumanoidRootPart")
+            if hrp then return hrp.Position end
+        end
+    end
+    return nil
+end
+
+F.killAllZombies = function()
+    for _, z in ipairs(F.getZombies()) do
+        local hum = z:FindFirstChildOfClass("Humanoid")
+        if hum then pcall(function() hum.Health = 0 end) end
+    end
+end
+
+F.collectAllDrops = function()
+    if not C.RootPart then return end
+    for _, drop in ipairs(F.getDrops()) do
+        pcall(function() drop.CFrame = C.RootPart.CFrame end)
+    end
+end
+
+F.applySpeed = function()
+    if C.Humanoid then
+        C.Humanoid.WalkSpeed = CONFIG.SpeedEnabled and CONFIG.SpeedValue or 16
+    end
+end
+
+F.applyJump = function()
+    if C.Humanoid then
+        C.Humanoid.UseJumpPower = true
+        C.Humanoid.JumpPower = CONFIG.JumpEnabled and CONFIG.JumpValue or 50
+    end
+end
+
+F.updateNoclip = function()
+    if not C.Character then return end
+    for _, part in ipairs(C.Character:GetDescendants()) do
+        if part:IsA("BasePart") then
+            part.CanCollide = not CONFIG.Noclip
+        end
+    end
+end
+
+F.createEsp = function(model, color)
+    if C.EspCache[model] then return end
+    local box = Instance.new("BoxHandleAdornment")
+    box.Size = model:GetExtentsSize()
+    box.Adornee = model
+    box.AlwaysOnTop = true
+    box.ZIndex = 5
+    box.Transparency = 0.65
+    box.Color3 = color
+    box.Parent = model
+    C.EspCache[model] = box
+end
+
+F.removeEsp = function(model)
+    if C.EspCache[model] then
+        C.EspCache[model]:Destroy()
+        C.EspCache[model] = nil
+    end
+end
+
+F.updateEsp = function()
+    if not C.ZombieEspEnabled and not C.BossEspEnabled then
+        for _, b in pairs(C.EspCache) do b:Destroy() end
+        table.clear(C.EspCache)
+        return
+    end
+    for _, z in ipairs(F.getZombies()) do
+        local isBoss = z.Parent and z.Parent.Name == "Bosses"
+        local should = (isBoss and C.BossEspEnabled) or (not isBoss and C.ZombieEspEnabled)
+        if should then
+            if not C.EspCache[z] then
+                F.createEsp(z, isBoss and Color3.fromRGB(255, 180, 0) or Color3.fromRGB(220, 30, 40))
+            else
+                C.EspCache[z].Size = z:GetExtentsSize()
+            end
+        else
+            F.removeEsp(z)
+        end
+    end
+end
+
+F.startMainLoop = function()
+    task.spawn(function()
+        while task.wait(0.1) do
+            F.safeCall(function()
+                if CONFIG.KillAura and C.RootPart then
+                    for _, z in ipairs(F.getZombies()) do
+                        local hrp = z:FindFirstChild("HumanoidRootPart")
+                        local hum = z:FindFirstChildOfClass("Humanoid")
+                        if hrp and hum and (hrp.Position - C.RootPart.Position).Magnitude <= CONFIG.KillAuraRange then
+                            pcall(function() hum.Health = 0 end)
+                        end
+                    end
+                end
+                if CONFIG.AutoCollect and C.RootPart then
+                    for _, drop in ipairs(F.getDrops()) do
+                        if (drop.Position - C.RootPart.Position).Magnitude <= CONFIG.CollectRange then
+                            pcall(function() drop.CFrame = C.RootPart.CFrame end)
+                        end
+                    end
+                end
+                if CONFIG.AutoKillBoss then
+                    local boss = F.getBoss()
+                    if boss then
+                        local hum = boss:FindFirstChildOfClass("Humanoid")
+                        if hum then pcall(function() hum.Health = 0 end) end
+                    end
+                end
+                if CONFIG.Invincible and C.Humanoid then
+                    C.Humanoid.Health = C.Humanoid.MaxHealth
+                end
+                if CONFIG.Noclip then F.updateNoclip() end
+                if CONFIG.InfiniteJump and C.Humanoid then
+                    C.Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+                end
+            end)
+        end
+    end)
+    RunService.RenderStepped:Connect(function()
+        F.safeCall(F.updateEsp)
+    end)
+end
+
+F.setupFreeCam = function()
+    local keys = {}
+    UIS.InputBegan:Connect(function(input, processed)
+        if processed then return end
+        keys[input.KeyCode] = true
+    end)
+    UIS.InputEnded:Connect(function(input)
+        keys[input.KeyCode] = false
+    end)
+    RunService.RenderStepped:Connect(function(dt)
+        if not CONFIG.FreeCam then return end
+        local cam = WS.CurrentCamera
+        local speed = CONFIG.FreeCamSpeed * dt
+        local move = Vector3.zero
+        if keys[Enum.KeyCode.W] then move = move + cam.CFrame.LookVector end
+        if keys[Enum.KeyCode.S] then move = move - cam.CFrame.LookVector end
+        if keys[Enum.KeyCode.A] then move = move - cam.CFrame.RightVector end
+        if keys[Enum.KeyCode.D] then move = move + cam.CFrame.RightVector end
+        if keys[Enum.KeyCode.Space] then move = move + Vector3.new(0, 1, 0) end
+        if keys[Enum.KeyCode.LeftControl] then move = move - Vector3.new(0, 1, 0) end
+        if move.Magnitude > 0 then cam.CFrame = cam.CFrame + move.Unit * speed end
+    end)
+end
+
+F.onCharacterAdded = function(char)
+    C.Character = char
+    C.Humanoid = char:WaitForChild("Humanoid")
+    C.RootPart = char:WaitForChild("HumanoidRootPart")
+    F.applySpeed()
+    F.applyJump()
+end
+
+Players.LocalPlayer.CharacterAdded:Connect(F.onCharacterAdded)
+
+shared.Potent.Functions = F
+warn("[Potent] ส่วนที่ 2: Functions โหลดแล้ว")
